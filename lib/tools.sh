@@ -33,13 +33,16 @@ bootstrap_build_tools() {
    : "${ctx[FINALENV]?missing ctx[FINALENV]}"
    : "${IGconf_sys_workroot?missing IGconf_sys_workroot}"
    : "${DEB_BUILD_GNU_TYPE?missing DEB_BUILD_GNU_TYPE}"
-   : "${IGconf_sys_buildroot?missing IGconf_sys_buildroot}"
+
+   local sys_buildroot
+   sys_buildroot=$(get_var IGconf_sys_buildroot "${ctx[FINALENV]}") ||
+      die "IGconf_sys_buildroot is missing from ${ctx[FINALENV]}"
 
    local tools=( $(collect_build_deps "${ctx[FINALENV]}") )
    local destdir="${IGconf_sys_workroot}/${DEB_BUILD_GNU_TYPE}"
    local prefix=/usr
    local start=$SECONDS
-   local runtime_path="${IGconf_sys_buildroot}/host/${DEB_BUILD_GNU_TYPE}/usr"
+   local runtime_path="${sys_buildroot}/host/${DEB_BUILD_GNU_TYPE}/usr"
 
    runenv "${ctx[FINALENV]}" \
       make -s -j"$(nproc)" -C "${IGTOP}/package" "${tools[@]}" \
