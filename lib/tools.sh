@@ -33,15 +33,30 @@ bootstrap_build_tools() {
    : "${ctx[FINALENV]?missing ctx[FINALENV]}"
    : "${IGconf_sys_workroot?missing IGconf_sys_workroot}"
    : "${DEB_BUILD_GNU_TYPE?missing DEB_BUILD_GNU_TYPE}"
+   : "${IGconf_sys_buildroot?missing IGconf_sys_buildroot}"
 
    local tools=( $(collect_build_deps "${ctx[FINALENV]}") )
    local destdir="${IGconf_sys_workroot}/${DEB_BUILD_GNU_TYPE}"
    local prefix=/usr
    local start=$SECONDS
+   local runtime_path="${IGconf_sys_buildroot}/host/${DEB_BUILD_GNU_TYPE}/usr"
 
    runenv "${ctx[FINALENV]}" \
       make -s -j"$(nproc)" -C "${IGTOP}/package" "${tools[@]}" \
       PKG_DESTDIR="$destdir" PKG_PREFIX="$prefix"
+
+   # Package recipes prune shared sysroot paths, so clean them after all installs.
+   rm -rf \
+      "$runtime_path"/lib/*.a \
+      "$runtime_path"/lib/*.la \
+      "$runtime_path"/include \
+      "$runtime_path"/lib/pkgconfig \
+      "$runtime_path"/lib/python*/dist-packages/*.dist-info \
+      "$runtime_path"/lib/python*/dist-packages/*.data \
+      "$runtime_path"/lib/python*/dist-packages/test* \
+      "$runtime_path"/lib/python*/dist-packages/__pycache__ \
+      "$runtime_path"/share/doc \
+      "$runtime_path"/share/man
 
    local elapsed=$(( SECONDS - start ))
    msg "Building host support took $((elapsed / 60))m$((elapsed % 60))s"

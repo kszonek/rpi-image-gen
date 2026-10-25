@@ -165,13 +165,6 @@ $(PKG_BUILD_STAMP): $(PKG_SOURCE_STAMP) | $(PIP_CACHE) $(PIP_WHEELS)
 $(PKG_INSTALL_STAMP): $(PKG_BUILD_STAMP) | $(PKG_DESTDIR) $(PKG_RUNTIME_DESTDIR)
 	$(call msg,INSTALL)
 	@$(foreach d,$|,$(call installwheel,$(d));)
-	@rm -rf \
-		$(PKG_RUNTIME_PATH)/lib/python*/dist-packages/*.dist-info \
-		$(PKG_RUNTIME_PATH)/lib/python*/dist-packages/*.data \
-		$(PKG_RUNTIME_PATH)/lib/python*/dist-packages/test* \
-		$(PKG_RUNTIME_PATH)/lib/python*/dist-packages/__pycache__ \
-		$(PKG_RUNTIME_PATH)/share/doc \
-		$(PKG_RUNTIME_PATH)/share/man
 	@touch $@
 
 else ifeq ($(PKG_BUILD_SCHEME),autotools)
@@ -228,13 +221,6 @@ $(PKG_INSTALL_STAMP): $(PKG_BUILD_STAMP) | $(PKG_RUNTIME_DESTDIR) $(PKG_DESTDIR)
 	$(call msg,INSTALL)
 	@$(foreach d,$|,$(call run,env $(PKG_ENVIRONMENT) \
 		$(MAKE) -C $(PKG_BUILD_PATH) install $(PKG_MAKE_OPTS) DESTDIR=$(d));)
-	@rm -rf \
-		$(PKG_RUNTIME_PATH)/lib/*.a \
-		$(PKG_RUNTIME_PATH)/lib/*.la \
-		$(PKG_RUNTIME_PATH)/include \
-		$(PKG_RUNTIME_PATH)/lib/pkgconfig \
-		$(PKG_RUNTIME_PATH)/share/doc \
-		$(PKG_RUNTIME_PATH)/share/man
 	@touch $@
 
 else ifeq ($(PKG_BUILD_SCHEME),makefile)
@@ -252,13 +238,6 @@ $(PKG_INSTALL_STAMP): $(PKG_BUILD_STAMP) | $(PKG_DESTDIR) $(PKG_RUNTIME_DESTDIR)
 	@$(foreach d,$|,$(call run,env $(PKG_ENVIRONMENT) \
 		$(MAKE) -C $(PKG_SOURCE_PATH) install $(PKG_MAKE_OPTS) \
 		PREFIX=$(PKG_PREFIX) DESTDIR=$(d));)
-	@rm -rf \
-		$(PKG_RUNTIME_PATH)/lib/*.a \
-		$(PKG_RUNTIME_PATH)/lib/*.la \
-		$(PKG_RUNTIME_PATH)/include \
-		$(PKG_RUNTIME_PATH)/lib/pkgconfig \
-		$(PKG_RUNTIME_PATH)/share/doc \
-		$(PKG_RUNTIME_PATH)/share/man
 	@touch $@
 
 else
